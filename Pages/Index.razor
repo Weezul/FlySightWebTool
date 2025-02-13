@@ -8,7 +8,7 @@
 @inject TrackService TrackService
 @inject IJSRuntime JS
 
-<div id="plotlyChart" style="width:100%; height:400px;"></div>
+<div id="plotlyChart" style="width:100%; height:100%;"></div>
 
 @if (track == null)
 {
@@ -25,27 +25,32 @@ else
             <tr>
                 <th>Exit</th>
                 <td>@track.ExitHeight.ToString("F0")m AGL at @track.ExitDateTime.ToString("HH:mm")</td>
-            </tr>
-            <tr>
-                <th>Pitch</th>
-                <td>@track.PitchHeight.ToString("F0")m AGL at @track.PitchDateTime.ToString("HH:mm")</td>
-            </tr>
-            <tr>
                 <th>Landing</th>
                 <td>@track.LandingTime.ToString("HH:mm")</td>
             </tr>
             <tr>
-                <th>Flight time</th>
-                <td>@track.FlightTime.ToString("F0")s over @((track.ExitAltitude - track.PitchAltitude).ToString("F0"))m</td>
-            </tr>
-            <tr>
-                <th>Total time</th>
-                <td>@((track.LandingTime - track.TakeOffDateTime).TotalMinutes.ToString("F0"))min
-                </td>            
-            </tr>
-            <tr>
+                <th>Pitch</th>
+                <td>@track.PitchHeight.ToString("F0")m AGL at @track.PitchDateTime.ToString("HH:mm")</td>
                 <th>DZ Elevation offset</th>
                 <td>@track.DzAltitude.ToString("F0")m AMSL</td>
+            </tr>
+            <tr>
+                <th>Flight time</th>
+                <td>@track.FlightTime.ToString("F0")s over @((track.ExitAltitude - track.PitchAltitude).ToString("F0"))m</td>
+                <th>Total time</th>
+                <td>@((track.LandingTime - track.TakeOffDateTime).TotalMinutes.ToString("F0"))min</td>
+            </tr>
+            <tr>
+                <th>Total velocity (Max)</th>
+                <td>@track.VelocityTotalMax.ToString("F0") km/h</td>
+                <th>Total velocity (Min)</th>
+                <td>@track.VelocityTotalMin.ToString("F0") km/h</td>
+            </tr>
+            <tr>
+                <th>Ground velocity (Max)</th>
+                <td>@track.VelocityGroundMax.ToString("F0") km/h</td>                
+                <th>Glide ratio (Max)</th>
+                <td>@track.GlideRatioMax.ToString("F2")</td>
             </tr>
         </tbody>
     </table>
