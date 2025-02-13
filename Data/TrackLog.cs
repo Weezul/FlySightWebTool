@@ -78,13 +78,13 @@ public class TrackLog
         AccelerationNorth = (VelocityNorth - prevTrackLog.VelocityNorth) / timeDelta;
 
         AccelerationTotal = Math.Sqrt(
-            Math.Pow(AccelerationDown, 2) +
-            Math.Pow(AccelerationEast, 2) +
-            Math.Pow(AccelerationNorth, 2));
+            AccelerationDown * AccelerationDown + 
+            AccelerationEast * AccelerationEast +
+            AccelerationNorth * AccelerationNorth);
 
         AccelerationGround = Math.Sqrt(
-            Math.Pow(AccelerationDown, 2) +
-            Math.Pow(AccelerationEast, 2));
+            AccelerationEast * AccelerationEast +
+            AccelerationNorth * AccelerationNorth);
 
         FlightTimeStamp = exitDateTime > DateTime.MinValue ? (Time - exitDateTime).TotalSeconds : 0.0;
         GlideRatio = calculateGlideRatio(prevTrackLog);
