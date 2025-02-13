@@ -73,23 +73,29 @@ public class TrackLog
     {
         Height = Altitude - dzAltitude;
 
-        double timeDelta = (Time - prevTrackLog.Time).TotalSeconds; // Corrected time delta calculation
+        double timeDelta = (Time - prevTrackLog.Time).TotalSeconds;
         AccelerationDown = (VelocityDown - prevTrackLog.VelocityDown) / timeDelta;
         AccelerationEast = (VelocityEast - prevTrackLog.VelocityEast) / timeDelta;
         AccelerationNorth = (VelocityNorth - prevTrackLog.VelocityNorth) / timeDelta;
 
-        AccelerationTotal = Math.Sqrt(
-            AccelerationDown * AccelerationDown + 
-            AccelerationEast * AccelerationEast +
-            AccelerationNorth * AccelerationNorth);
-
-        AccelerationGround = Math.Sqrt(
-            AccelerationEast * AccelerationEast +
-            AccelerationNorth * AccelerationNorth);
+        AccelerationTotal = GetSignedAcceleration(VelocityNorth, VelocityEast, VelocityDown, AccelerationNorth, AccelerationEast, AccelerationDown);
+        AccelerationGround = GetSignedAcceleration(VelocityNorth, VelocityEast, 0, AccelerationNorth, AccelerationEast, 0);
 
         FlightTimeStamp = exitDateTime > DateTime.MinValue ? (Time - exitDateTime).TotalSeconds : 0.0;
         HorizontalDistance = calculateHorizontalDistance(prevTrackLog);
         GlideRatio = calculateGlideRatio(prevTrackLog);
+    }
+
+    static double GetSignedAcceleration(double vN, double vE, double vD, double aN, double aE, double aD)
+    {
+        // Compute acceleration magnitude
+        double totalAcceleration = Math.Sqrt(aN * aN + aE * aE + aD * aD);
+
+        // Compute dot product
+        double dotProduct = vN * aN + vE * aE + vD * aD;
+
+        // Assign sign based on dot product
+        return dotProduct < 0 ? -totalAcceleration : totalAcceleration;
     }
 
     private double calculateHorizontalDistance(TrackLog prevTrackLog)
