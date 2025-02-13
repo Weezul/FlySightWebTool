@@ -8,8 +8,6 @@
 @inject TrackService TrackService
 @inject IJSRuntime JS
 
-<PageTitle>Track</PageTitle>
-
 <div id="plotlyChart" style="width:100%; height:400px;"></div>
 
 @if (track == null)
@@ -54,7 +52,7 @@ else
 }
 
 @code {
-    private Track track;
+    private Track? track;
     private string message = "";
 
     protected override async Task OnInitializedAsync()

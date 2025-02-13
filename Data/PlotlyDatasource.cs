@@ -15,7 +15,7 @@ public class PlotlyDatasource
         return new object[]
             {
                 CreateSeries(t => t.Height, "Height (AGL)", "y1", "grey"),
-                CreateSeries(t => t.GlideRatio, "Glide Ratio", "y2", "green"),
+                CreateSeries(t => t.GlideRatio, "Glide Ratio", "y2", "lime"),
                 CreateSeries(t => t.VelocityDownKmh, "Speed Vert (km/h)", "y3", "purple"),
                 CreateSeries(t => t.VelocityGroundKmh, "Speed Ground (km/h)", "y3", "cyan"), // Grouped with Speed Vert
                 CreateSeries(t => t.VelocityTotalKmh, "Speed Total (km/h)", "y3", "blue"), // Grouped with Speed Vert
@@ -29,20 +29,23 @@ public class PlotlyDatasource
     {
         return new
         {
-            title = "Flight Data Visualization",
-            xaxis = new { title = "Time (s)" },
-            yaxis = CreateYAxis("Height (m)", "lightgrey", ".0f", true, "left", 0),
-            yaxis2 = CreateYAxis("Glide Ratio", "lightgrey", ".1f", true, "left", 0.1, "y"),
-            yaxis3 = CreateYAxis("Speed (km/h)", "lightgrey", ".0f", true, "right", 1, "y"),
-            yaxis4 = CreateYAxis("Acceleration (m/s²)", "lightgrey", ".1f", true, "right", 0.9, "y"),
+            title = new { text = "Flight Data Visualization", font = new { color = "white" } },
+            xaxis = new { title = new { text = "Time (s)", font = new { color = "white" } }, tickfont = new { color = "white" } },
+            yaxis = CreateYAxis("Height (m)", "white", ".0f", true, "left", 0),
+            yaxis2 = CreateYAxis("Glide Ratio", "white", ".1f", true, "left", 0.1, "y"),
+            yaxis3 = CreateYAxis("Speed (km/h)", "white", ".0f", true, "right", 1, "y"),
+            yaxis4 = CreateYAxis("Acceleration (m/s²)", "white", ".1f", true, "right", 0.9, "y"),
             legend = new
             {
                 orientation = "h", // horizontal layout
                 yanchor = "bottom",
                 y = -0.5, // position below the graph
                 xanchor = "center",
-                x = 0.5 // center horizontally
-            }
+                x = 0.5, // center horizontally
+                font = new { color = "white" }
+            },
+            plot_bgcolor = "rgba(0,0,0,0)", // Transparent plot background
+            paper_bgcolor = "rgba(0,0,0,0)"  // Transparent paper background
         };
     }
 
@@ -62,7 +65,7 @@ public class PlotlyDatasource
         };
     }
 
-    private object CreateYAxis(string name, string color, string tickFormat = ".1f", bool showLabels = false, string side = "left", double position = 0, string overlaying = null)
+    private object CreateYAxis(string name, string color, string tickFormat = ".1f", bool showLabels = false, string side = "left", double position = 0, string? overlaying = null)
     {
         return new
         {
@@ -74,7 +77,8 @@ public class PlotlyDatasource
             showticklabels = showLabels,  // Hide tick labels unless specified
             showgrid = false,
             zeroline = false,
-            overlaying = overlaying // Overlay on the same plot
+            overlaying = overlaying, // Overlay on the same plot
+            tickfont = new { color = "white" }
         };
     }
 }
