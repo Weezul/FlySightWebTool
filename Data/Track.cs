@@ -22,7 +22,8 @@ public class Track
     //Max values
     public double VelocityTotalMax => Data.Max(d => d.VelocityTotalKmh);
     public double VelocityTotalMin => Data.Min(d => d.VelocityTotalKmh);
-    public double VelocityGroundMax => Data.Max(d => d.VelocityGroundKmh);
+    public double VelocityGroundMax => Data.Max(d => d.VelocityGroundKmh);    
+    public double HorizontalDistance => Data.Sum(d => d.HorizontalDistance);    
     public double GlideRatioMax => Data.Max(d => d.GlideRatio);    
 
     public Track()

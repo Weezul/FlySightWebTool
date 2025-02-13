@@ -32,6 +32,7 @@ public class TrackLog
     public double VelocityDownKmh => VelocityDown * 3.6; //Velocity down (km/h)
     public double VelocityGroundKmh => VelocityGround * 3.6; //Velocity ground (km/h)
     public double VelocityTotalKmh => VelocityTotal * 3.6; //Velocity total (km/h)
+    public double HorizontalDistance { get; set; } //Horizontal distance (m)
 
     public static TrackLog FromCsvLine(string csvLine)
     {
@@ -72,7 +73,7 @@ public class TrackLog
     {
         Height = Altitude - dzAltitude;
 
-        double timeDelta = (prevTrackLog.Time - Time).TotalSeconds;
+        double timeDelta = (Time - prevTrackLog.Time).TotalSeconds; // Corrected time delta calculation
         AccelerationDown = (VelocityDown - prevTrackLog.VelocityDown) / timeDelta;
         AccelerationEast = (VelocityEast - prevTrackLog.VelocityEast) / timeDelta;
         AccelerationNorth = (VelocityNorth - prevTrackLog.VelocityNorth) / timeDelta;
@@ -87,15 +88,23 @@ public class TrackLog
             AccelerationNorth * AccelerationNorth);
 
         FlightTimeStamp = exitDateTime > DateTime.MinValue ? (Time - exitDateTime).TotalSeconds : 0.0;
+        HorizontalDistance = calculateHorizontalDistance(prevTrackLog);
         GlideRatio = calculateGlideRatio(prevTrackLog);
+    }
+
+    private double calculateHorizontalDistance(TrackLog prevTrackLog)
+    {
+        return HaversineDistance(prevTrackLog.Latitude, prevTrackLog.Longitude, Latitude, Longitude); // in meters
     }
 
     private double calculateGlideRatio(TrackLog prevTrackLog)
     {
-        double horizontalDistance = HaversineDistance(prevTrackLog.Latitude, prevTrackLog.Longitude, Latitude, Longitude); // in meters
         double altitudeChange = prevTrackLog.Altitude - Altitude; // Negative if climbing
 
-        return horizontalDistance / altitudeChange;
+        if (HorizontalDistance == 0.0)
+            HorizontalDistance = calculateHorizontalDistance(prevTrackLog);
+
+        return HorizontalDistance / altitudeChange;
     }
 
     private static double HaversineDistance(double lat1, double lon1, double lat2, double lon2)

@@ -8,7 +8,7 @@
 @inject TrackService TrackService
 @inject IJSRuntime JS
 
-<div id="plotlyChart" style="width:100%; height:100%;"></div>
+<div id="plotlyChart" style="width:100%; height:800px;"></div>
 
 @if (track == null)
 {
@@ -49,8 +49,14 @@ else
             <tr>
                 <th>Ground speed (Max)</th>
                 <td>@track.VelocityGroundMax.ToString("F0") km/h</td>                
+                <th>Track length</th>
+                <td>@track.HorizontalDistance.ToString("F0") km</td>
+            </tr>
+            <tr>
                 <th>Glide ratio (Max)</th>
                 <td>@track.GlideRatioMax.ToString("F2")</td>
+                <th>Glide ratio (Avg)</th>
+                <td>@(((track.HorizontalDistance) / (track.ExitAltitude - track.PitchAltitude)).ToString("F2"))</td>
             </tr>
         </tbody>
     </table>
