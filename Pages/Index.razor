@@ -23,28 +23,28 @@ else
     <table class="table">
         <tbody>            
             <tr>
-                <td>Exit</td>
+                <th>Exit</th>
                 <td>@track.ExitHeight.ToString("F0")m AGL at @track.ExitDateTime.ToString("HH:mm")</td>
             </tr>
             <tr>
-                <td>Pitch</td>
+                <th>Pitch</th>
                 <td>@track.PitchHeight.ToString("F0")m AGL at @track.PitchDateTime.ToString("HH:mm")</td>
             </tr>
             <tr>
-                <td>Landing</td>
+                <th>Landing</th>
                 <td>@track.LandingTime.ToString("HH:mm")</td>
             </tr>
             <tr>
-                <td>Flight time</td>
+                <th>Flight time</th>
                 <td>@track.FlightTime.ToString("F0")s over @((track.ExitAltitude - track.PitchAltitude).ToString("F0"))m</td>
             </tr>
             <tr>
-                <td>Total time</td>
+                <th>Total time</th>
                 <td>@((track.LandingTime - track.TakeOffDateTime).TotalMinutes.ToString("F0"))min
                 </td>            
             </tr>
             <tr>
-                <td>DZ Elevation offset</td>
+                <th>DZ Elevation offset</th>
                 <td>@track.DzAltitude.ToString("F0")m AMSL</td>
             </tr>
         </tbody>
