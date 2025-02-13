@@ -20,7 +20,7 @@ public class PlotlyDatasource
                 CreateSeries(t => t.VelocityGroundKmh, "Speed Ground (km/h)", "y3", "cyan"), // Grouped with Speed Vert
                 CreateSeries(t => t.VelocityTotalKmh, "Speed Total (km/h)", "y3", "blue"), // Grouped with Speed Vert
                 CreateSeries(t => t.AccelerationDown, "V Accl (m/s²)", "y4", "orange"),
-                CreateSeries(t => t.AccelerationGround, "H Accl (m/s²)", "y4", "brown"), // Grouped with V Accl
+                CreateSeries(t => t.AccelerationGround, "H Accl (m/s²)", "y4", "yellow"), // Grouped with V Accl
                 CreateSeries(t => t.AccelerationTotal, "Accl (m/s²)", "y4", "red") // Grouped with V Accl
             };
     }
@@ -31,10 +31,10 @@ public class PlotlyDatasource
         {
             title = new { text = "Flight Data Visualization", font = new { color = "white" } },
             xaxis = new { title = new { text = "Time (s)", font = new { color = "white" } }, tickfont = new { color = "white" } },
-            yaxis = CreateYAxis("Height (m)", "white", ".0f", true, "left", 0),
-            yaxis2 = CreateYAxis("Glide Ratio", "white", ".1f", true, "left", 0.1, "y"),
-            yaxis3 = CreateYAxis("Speed (km/h)", "white", ".0f", true, "right", 1, "y"),
-            yaxis4 = CreateYAxis("Acceleration (m/s²)", "white", ".1f", true, "right", 0.9, "y"),
+            yaxis = CreateYAxis("Height (m)", ".0f", true, "left", 0),
+            yaxis2 = CreateYAxis("Glide Ratio", ".1f", true, "left", 0.1, "y"),
+            yaxis3 = CreateYAxis("Speed (km/h)", ".0f", true, "right", 1, "y"),
+            yaxis4 = CreateYAxis("Acceleration (m/s²)", ".1f", true, "right", 0.9, "y"),
             legend = new
             {
                 orientation = "h", // horizontal layout
@@ -65,12 +65,12 @@ public class PlotlyDatasource
         };
     }
 
-    private object CreateYAxis(string name, string color, string tickFormat = ".1f", bool showLabels = false, string side = "left", double position = 0, string? overlaying = null)
+    private object CreateYAxis(string name, string tickFormat = ".1f", bool showLabels = false, string side = "left", double position = 0, string? overlaying = null)
     {
         return new
         {
             title = showLabels ? name : "",  // Show title only if labels are enabled
-            titlefont = new { color = color },
+            titlefont = new { color = "White" },
             tickformat = tickFormat,
             side = side,
             position = position,
