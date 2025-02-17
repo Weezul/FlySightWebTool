@@ -161,7 +161,7 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-        {
+        {            
             await JS.InvokeVoidAsync("initializeMap");
         }
         else
@@ -173,8 +173,10 @@
             var data = plotlyDatasource.getData();
             var layout = plotlyDatasource.getLayout();
 
+            //Load chart data
             await JS.InvokeVoidAsync("plotlyInterop.createChart", "plotlyChart", data, layout);
 
+            //Load map data
             var coordinates = track.Data.Select(d => new { lat = d.Latitude, lng = d.Longitude }).ToList();
             await JS.InvokeVoidAsync("drawPathOnMap", coordinates);
         }
