@@ -8,14 +8,12 @@
 @inject TrackService TrackService
 @inject IJSRuntime JS
 
-<h1>Track</h1>
-<p><InputFile OnChange="HandleFileSelected" accept=".csv" /></p>
+<p>Track: @message <InputFile OnChange="HandleFileSelected" accept=".csv" /></p>
 <div id="plotlyChart" style="width:100%; height:800px;"></div>
 <div style="display: flex;">
     <div style="flex: 1; padding: 10px;">
         @if (track == null)
-        {
-            <h3>@message</h3>
+        {            
             <table id="stats" class="table">
                 <tbody>            
                     <tr>
@@ -145,6 +143,8 @@
             this.StateHasChanged();
 
             track = await TrackService.LoadTrackFromFileAsync(fileContent.ToString());
+
+            message = ""; //Done
 
             if (track.Data.Count == 0)
             {
