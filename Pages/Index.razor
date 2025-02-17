@@ -15,52 +15,59 @@
     <h1>Track</h1>
     <p><InputFile OnChange="HandleFileSelected" accept=".csv" /></p>
     <p><em>@message</em></p>
-    <div id="map" style="width:100%; height:800px;"></div>
+    <div id="map" style="width:100%; height:400px;"></div>
 }
 else
 {
-    <h3>@track.TakeOffDateTime.ToString("HH:mm (d MMMM yyyy)")</h3>
+    <div style="display: flex;">
+        <div style="flex: 1; padding: 10px;">
+            <h3>@track.TakeOffDateTime.ToString("HH:mm (d MMMM yyyy)")</h3>
 
-    <table id="stats" class="table">
-        <tbody>            
-            <tr>
-                <th>Exit</th>
-                <td>@track.ExitHeight.ToString("F0")m AGL at @track.ExitDateTime.ToString("HH:mm")</td>
-                <th>Landing</th>
-                <td>@track.LandingTime.ToString("HH:mm")</td>
-            </tr>
-            <tr>
-                <th>Pitch</th>
-                <td>@track.PitchHeight.ToString("F0")m AGL at @track.PitchDateTime.ToString("HH:mm")</td>
-                <th>DZ Elevation offset</th>
-                <td>@track.DzAltitude.ToString("F0")m AMSL</td>
-            </tr>
-            <tr>
-                <th>Flight time</th>
-                <td>@track.FlightTime.ToString("F0")s over @((track.ExitAltitude - track.PitchAltitude).ToString("F0"))m</td>
-                <th>Total time</th>
-                <td>@((track.LandingTime - track.TakeOffDateTime).TotalMinutes.ToString("F0"))min</td>
-            </tr>
-            <tr>
-                <th>Total speed (Max)</th>
-                <td>@track.VelocityTotalMax.ToString("F0") km/h</td>
-                <th>Total speed (Min)</th>
-                <td>@track.VelocityTotalMin.ToString("F0") km/h</td>
-            </tr>
-            <tr>
-                <th>Ground speed (Max)</th>
-                <td>@track.VelocityGroundMax.ToString("F0") km/h</td>                
-                <th>Track length</th>
-                <td>@track.HorizontalDistance.ToString("F0") km</td>
-            </tr>
-            <tr>
-                <th>Glide ratio (Max)</th>
-                <td>@track.GlideRatioMax.ToString("F2")</td>
-                <th>Glide ratio (Avg)</th>
-                <td>@(((track.HorizontalDistance) / (track.ExitAltitude - track.PitchAltitude)).ToString("F2"))</td>
-            </tr>
-        </tbody>
-    </table>
+            <table id="stats" class="table">
+                <tbody>            
+                    <tr>
+                        <th>Exit</th>
+                        <td>@track.ExitHeight.ToString("F0")m AGL at @track.ExitDateTime.ToString("HH:mm")</td>
+                        <th>Landing</th>
+                        <td>@track.LandingTime.ToString("HH:mm")</td>
+                    </tr>
+                    <tr>
+                        <th>Pitch</th>
+                        <td>@track.PitchHeight.ToString("F0")m AGL at @track.PitchDateTime.ToString("HH:mm")</td>
+                        <th>DZ Elevation offset</th>
+                        <td>@track.DzAltitude.ToString("F0")m AMSL</td>
+                    </tr>
+                    <tr>
+                        <th>Flight time</th>
+                        <td>@track.FlightTime.ToString("F0")s over @((track.ExitAltitude - track.PitchAltitude).ToString("F0"))m</td>
+                        <th>Total time</th>
+                        <td>@((track.LandingTime - track.TakeOffDateTime).TotalMinutes.ToString("F0"))min</td>
+                    </tr>
+                    <tr>
+                        <th>Total speed (Max)</th>
+                        <td>@track.VelocityTotalMax.ToString("F0") km/h</td>
+                        <th>Total speed (Min)</th>
+                        <td>@track.VelocityTotalMin.ToString("F0") km/h</td>
+                    </tr>
+                    <tr>
+                        <th>Ground speed (Max)</th>
+                        <td>@track.VelocityGroundMax.ToString("F0") km/h</td>
+                        <th>Track length</th>
+                        <td>@track.HorizontalDistance.ToString("F0") km</td>
+                    </tr>
+                    <tr>
+                        <th>Glide ratio (Max)</th>
+                        <td>@track.GlideRatioMax.ToString("F2")</td>
+                        <th>Glide ratio (Avg)</th>
+                        <td>@(((track.HorizontalDistance) / (track.ExitAltitude - track.PitchAltitude)).ToString("F2"))</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="flex: 1; padding: 10px;">
+            <div id="map" style="width:100%; height:400px;"></div>
+        </div>
+    </div>
 }
 
 @code {
