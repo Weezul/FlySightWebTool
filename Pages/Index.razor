@@ -15,12 +15,13 @@
     <h1>Track</h1>
     <p><InputFile OnChange="HandleFileSelected" accept=".csv" /></p>
     <p><em>@message</em></p>
+    <div id="map" style="width:100%; height:800px;"></div>
 }
 else
 {
     <h3>@track.TakeOffDateTime.ToString("HH:mm (d MMMM yyyy)")</h3>
 
-    <table class="table">
+    <table id="stats" class="table">
         <tbody>            
             <tr>
                 <th>Exit</th>
@@ -117,7 +118,7 @@ else
     {
         if (firstRender)
         {
-
+            await JS.InvokeVoidAsync("initializeMap");
         }
         else
         {
@@ -129,6 +130,9 @@ else
             var layout = plotlyDatasource.getLayout();
 
             await JS.InvokeVoidAsync("plotlyInterop.createChart", "plotlyChart", data, layout);
+
+            var coordinates = track.Data.Select(d => new { lat = d.Latitude, lng = d.Longitude }).ToList();
+            await JS.InvokeVoidAsync("drawPathOnMap", coordinates);
         }
     }
 }
