@@ -16,12 +16,12 @@ public class PlotlyDatasource
             {
                 CreateSeries(t => t.Height, "Height (AGL)", "y1", "grey"),
                 CreateSeries(t => t.GlideRatio, "Glide Ratio", "y2", "lime"),
-                CreateSeries(t => t.VelocityDownKmh, "Speed Vert (km/h)", "y3", "purple"),
+                CreateSeries(t => t.VelocityDownKmh, "Speed Vert (km/h)", "y3", "red"),
                 CreateSeries(t => t.VelocityGroundKmh, "Speed Ground (km/h)", "y3", "cyan"), // Grouped with Speed Vert
                 CreateSeries(t => t.VelocityTotalKmh, "Speed Total (km/h)", "y3", "blue"), // Grouped with Speed Vert
-                CreateSeries(t => t.AccelerationDown, "V Accl (m/s²)", "y4", "orange"),
-                CreateSeries(t => t.AccelerationGround, "H Accl (m/s²)", "y4", "yellow"), // Grouped with V Accl
-                CreateSeries(t => t.AccelerationTotal, "Accl (m/s²)", "y4", "red") // Grouped with V Accl
+                CreateSeries(t => t.AccelerationDown, "V Accl (m/s²)", "y4", "orange", true),
+                CreateSeries(t => t.AccelerationGround, "H Accl (m/s²)", "y4", "yellow", true), // Grouped with V Accl
+                CreateSeries(t => t.AccelerationTotal, "Accl (m/s²)", "y4", "purple", true) // Grouped with V Accl
             };
     }
 
@@ -49,7 +49,7 @@ public class PlotlyDatasource
         };
     }
 
-    public object CreateSeries(Func<TrackLog, double> valueSelector, string name, string yAxis, string color)
+    public object CreateSeries(Func<TrackLog, double> valueSelector, string name, string yAxis, string color, bool hidden = false)
     {
         var yData = Track.Data.Select(valueSelector).ToArray();
 
@@ -61,7 +61,8 @@ public class PlotlyDatasource
             mode = "lines",
             name = name,
             yaxis = yAxis,
-            line = new { shape = "spline", color = color } // Hardcoded color
+            line = new { shape = "spline", color = color }, // Hardcoded color
+            visible = hidden ? "legendonly" : "true" // Hide series by default but keep in legend
         };
     }
 
