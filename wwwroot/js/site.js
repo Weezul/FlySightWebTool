@@ -45,4 +45,11 @@ function drawPathOnMap(coordinates) {
     });
 
     flightPath.setMap(window.map);
+
+    // Adjust map center and zoom to fit the path
+    const bounds = new google.maps.LatLngBounds();
+    coordinates.forEach(coord => {
+        bounds.extend(new google.maps.LatLng(coord.lat, coord.lng));
+    });
+    window.map.fitBounds(bounds);
 }
