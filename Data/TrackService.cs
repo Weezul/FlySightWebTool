@@ -66,7 +66,8 @@ public class TrackService
                 //Free fall starts when downward speed is significantly negative
                 else if (hasTakenOff &&
                         !hasExited &&
-                        trackLog.VelocityDown > 20) //Should be acceleration down over 3!! accoridng to flysight :)
+                        trackLog.VelocityDown > 10 &&
+                        trackLog.AccelerationDown > 3) //Should be acceleration down over 3!! accoridng to flysight :)
                 {
                     Track.ExitDateTime = trackLog.Time;
                     Track.ExitAltitude = trackLog.Altitude;
@@ -79,7 +80,7 @@ public class TrackService
                     Track.Data.Add(trackLog);
 
                     //Parachute opens when vertical speed reduces significantly
-                    if (trackLog.VelocityDown < 5)
+                    if (trackLog.VelocityTotal < 100 && trackLog.AccelerationDown < -10)
                     {
                         Track.PitchDateTime = trackLog.Time;
                         Track.PitchAltitude = trackLog.Altitude;
