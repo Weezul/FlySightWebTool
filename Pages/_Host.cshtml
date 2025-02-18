@@ -15,8 +15,10 @@
     <link href="FlySightWebTool.styles.css" rel="stylesheet" />
     <link rel="icon" type="image/png" href="favicon.png"/>
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBV2pNEzqnPBrW9OzPo60Zn7b0f5qZeWpQ&callback=initializeMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBV2pNEzqnPBrW9OzPo60Zn7b0f5qZeWpQ&callback=mapInterop.initializeMap" async defer></script>
     <script src="~/js/site.js"></script>
+    <script src="js/plotlyInterop.js"></script>
+    <script src="js/mapInterop.js"></script>    
 </head>
 <body>
     <app>
@@ -37,5 +39,6 @@
     <script src="_framework/blazor.server.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="js/plotlyInterop.js"></script>
+    <script src="js/mapInterop.js"></script>    
 </body>
 </html>

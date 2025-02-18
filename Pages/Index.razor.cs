@@ -78,7 +78,7 @@ namespace FlySightWebTool.Pages
             if (track != null && index >= 0 && index < track.Data.Count)
             {
                 var point = track.Data[index];
-                await JSRuntime.InvokeVoidAsync("placeMarker", point.Latitude, point.Longitude);
+                await JSRuntime.InvokeVoidAsync("mapInterop.placeMarker", point.Latitude, point.Longitude);
             }
 
             this.StateHasChanged();
@@ -88,7 +88,7 @@ namespace FlySightWebTool.Pages
         {
             if (firstRender)
             {            
-                await JSRuntime.InvokeVoidAsync("initializeMap");
+                await JSRuntime.InvokeVoidAsync("mapInterop.initializeMap");
             }
             else
             {
@@ -105,7 +105,7 @@ namespace FlySightWebTool.Pages
 
                 //Load map data
                 var coordinates = track.Data.Select(d => new { lat = d.Latitude, lng = d.Longitude }).ToList();
-                await JSRuntime.InvokeVoidAsync("drawPathOnMap", coordinates);
+                await JSRuntime.InvokeVoidAsync("mapInterop.drawPathOnMap", coordinates);
             }
         }
     }
