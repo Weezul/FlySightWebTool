@@ -29,6 +29,7 @@ window.mapInterop = {
         const mapOptions = {
             center: { lat: 47.3769, lng: 8.5417 }, // Centered at Zurich
             zoom: 12,
+            mapTypeId: google.maps.MapTypeId.HYBRID, // Set default map type to satellite
             styles: [
                 {
                     featureType: "all",
