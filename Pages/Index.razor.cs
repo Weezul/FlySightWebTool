@@ -9,14 +9,12 @@ namespace FlySightWebTool.Pages
     public partial class Index
     {
         private Track? _track;
-        private string _message = "";
-        private int _currentIndex;
+        private string _message;
 
         public Index()
         {
             _track = null;
             _message = "";
-            _currentIndex = 0;
         }
 
         /// <summary>
@@ -82,8 +80,6 @@ namespace FlySightWebTool.Pages
         [JSInvokable]
         public async Task UpdateXAxisValue(int index)
         {
-            _currentIndex = index;
-
             if (_track != null && index >= 0 && index < _track.Data.Count)
             {
                 var point = _track.Data[index];
