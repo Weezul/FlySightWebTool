@@ -8,7 +8,7 @@ window.plotlyInterop = {
         chart.on('plotly_hover', function (eventdata) {
             var pointIndex = eventdata.points[0].pointIndex;
             
-            object.invokeMethodAsync('UpdateXAxisValue', pointIndex)
+            object.invokeMethodAsync('UpdateGraphCursor', pointIndex)
                 .then(function () {
                     console.info('Successfully invoked .NET method');
                 })
