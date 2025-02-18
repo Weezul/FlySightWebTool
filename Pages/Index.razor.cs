@@ -104,8 +104,6 @@ namespace FlySightWebTool.Pages
             }
             else
             {
-                
-
                 if (_track == null || _track.Data.Count == 0)
                     return;
 
