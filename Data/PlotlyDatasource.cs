@@ -38,8 +38,8 @@ public class PlotlyDatasource
             legend = new
             {
                 orientation = "h", // horizontal layout
-                yanchor = "top",
-                //y = -0.5, // position below the graph
+                yanchor = "bottom",
+                y = 1.1, // position above the graph
                 xanchor = "center",
                 x = 0.5, // center horizontally
                 font = new { color = "white" }
