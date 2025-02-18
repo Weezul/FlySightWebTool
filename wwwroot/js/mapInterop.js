@@ -29,7 +29,7 @@ window.mapInterop = {
         const mapOptions = {
             center: { lat: 47.3769, lng: 8.5417 }, // Centered at Zurich
             zoom: 12,
-            mapTypeId: google.maps.MapTypeId.HYBRID, // Set default map type to satellite
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
             styles: [
                 {
                     featureType: "all",
@@ -57,7 +57,9 @@ window.mapInterop = {
             styles: null,
             disableDefaultUI: false,
             draggable: true,
-            scrollwheel: true
+            scrollwheel: true,
+            zoom: 8,
+            mapTypeId: google.maps.MapTypeId.HYBRID
         });
 
         const flightPath = new google.maps.Polyline({
