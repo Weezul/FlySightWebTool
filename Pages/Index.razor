@@ -15,7 +15,7 @@
 </div>
 <div style="display: flex; height: 340px;">
     <div style="flex: 1; padding: 10px; overflow-y: auto;">
-        @if (_track == null)
+        @if (_track == null || _track.Data.Count == 0)
         {            
             <h3>No data</h3>
             <table id="stats" class="table">
