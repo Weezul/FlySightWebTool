@@ -14,6 +14,7 @@ window.mapInterop = {
             if (typeof callback === 'function') {
                 callback();
             }
+            mapInterop.initializeMap();
         };
         document.head.appendChild(script);
     },
@@ -21,7 +22,7 @@ window.mapInterop = {
     // Initialize the Google Map
     initializeMap: function () {
         if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
-            setTimeout(mapInterop.initializeMap, 100); // Retry after 100ms if google or google.maps is not defined
+            setTimeout(mapInterop.initializeMap, 500); // Retry after 500ms if google or google.maps is not defined
             return;
         }
 
@@ -38,7 +39,7 @@ window.mapInterop = {
                     ]
                 }
             ],
-            disableDefaultUI: true, // Optional: Disables user interaction
+            disableDefaultUI: true, // Disables user interaction
             draggable: false,
             scrollwheel: false
         };

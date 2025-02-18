@@ -9,6 +9,9 @@ namespace FlySightWebTool.Pages
 {
     public partial class Index
     {
+        [Inject]
+        private IConfiguration Configuration { get; set; }
+
         private Track? _track;
         private string _message;
 
@@ -95,13 +98,14 @@ namespace FlySightWebTool.Pages
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-            {
-                var apiKey = "AIzaSyBV2pNEzqnPBrW9OzPo60Zn7b0f5qZeWpQ"; //_configuration["GoogleMapsApiKey"];
-                await JSRuntime.InvokeVoidAsync("mapInterop.loadGoogleMapsApi", apiKey, DotNetObjectReference.Create(this));
-                await JSRuntime.InvokeVoidAsync("mapInterop.initializeMap");
+            {             
+                var apiKey = Configuration["GoogleMapsApiKey"];
+                await JSRuntime.InvokeVoidAsync("mapInterop.loadGoogleMapsApi", apiKey);
             }
             else
             {
+                
+
                 if (_track == null || _track.Data.Count == 0)
                     return;
 
