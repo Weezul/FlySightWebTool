@@ -6,7 +6,6 @@ window.plotlyInterop = {
         var chart = document.getElementById(chartId);
         chart.on('plotly_hover', function (eventdata) {
             var pointIndex = eventdata.points[0].pointIndex;
-            console.log('plotly_hover event triggered, pointIndex:', pointIndex);
             
             object.invokeMethodAsync('UpdateXAxisValue', pointIndex)
                 .then(function () {

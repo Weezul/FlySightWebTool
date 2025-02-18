@@ -72,7 +72,6 @@ namespace FlySightWebTool.Pages
         [JSInvokable]
         public async Task UpdateXAxisValue(int index)
         {
-            Console.WriteLine($"UpdateXAxisValue called with index: {index}");
             currentIndex = index;
 
             if (track != null && index >= 0 && index < track.Data.Count)
