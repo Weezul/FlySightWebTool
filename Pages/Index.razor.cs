@@ -11,19 +11,11 @@ namespace FlySightWebTool.Pages
     {
         private Track? _track;
         private string _message;
-        private readonly IConfiguration _configuration;
 
         public Index()
         {
             _track = null;
             _message = "";
-        }
-
-        public Index(IConfiguration configuration)
-        {
-            _track = null;
-            _message = "";
-            _configuration = configuration;
         }
 
         /// <summary>
