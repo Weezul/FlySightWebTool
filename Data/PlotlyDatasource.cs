@@ -2,30 +2,38 @@ namespace FlySightWebTool.Data;
 
 public class PlotlyDatasource
 {
-    private Track Track;
-    private double[] flightTime => Track.Data.Select(t => t.FlightTimeStamp).ToArray();    
+    private readonly Track _track;
+    private double[] FlightTime => _track.Data.Select(t => t.FlightTimeStamp).ToArray();
 
     public PlotlyDatasource(Track track)
     {
-        Track = track;
+        _track = track;
     }
 
-    public object[] getData()
+    /// <summary>
+    /// Get the data series for the chart.
+    /// </summary>
+    /// <returns>An array of data series objects.</returns>
+    public object[] GetData()
     {
         return new object[]
-            {
-                CreateSeries(t => t.Height, "Height (AGL)", "y1", "grey"),
-                CreateSeries(t => t.GlideRatio, "Glide Ratio", "y2", "lime"),
-                CreateSeries(t => t.VelocityDownKmh, "Speed Vert (km/h)", "y3", "red"),
-                CreateSeries(t => t.VelocityGroundKmh, "Speed Ground (km/h)", "y3", "cyan"), // Grouped with Speed Vert
-                CreateSeries(t => t.VelocityTotalKmh, "Speed Total (km/h)", "y3", "blue"), // Grouped with Speed Vert
-                CreateSeries(t => t.AccelerationDown, "V Accl (m/s²)", "y4", "orange", true),
-                CreateSeries(t => t.AccelerationGround, "H Accl (m/s²)", "y4", "yellow", true), // Grouped with V Accl
-                CreateSeries(t => t.AccelerationTotal, "Accl (m/s²)", "y4", "purple", true) // Grouped with V Accl
-            };
+        {
+            CreateSeries(t => t.Height, "Height (AGL)", "y1", "grey"),
+            CreateSeries(t => t.GlideRatio, "Glide Ratio", "y2", "lime"),
+            CreateSeries(t => t.VelocityDownKmh, "Speed Vert (km/h)", "y3", "red"),
+            CreateSeries(t => t.VelocityGroundKmh, "Speed Ground (km/h)", "y3", "cyan"), // Grouped with Speed Vert
+            CreateSeries(t => t.VelocityTotalKmh, "Speed Total (km/h)", "y3", "blue"), // Grouped with Speed Vert
+            CreateSeries(t => t.AccelerationDown, "V Accl (m/s²)", "y4", "orange", true),
+            CreateSeries(t => t.AccelerationGround, "H Accl (m/s²)", "y4", "yellow", true), // Grouped with V Accl
+            CreateSeries(t => t.AccelerationTotal, "Accl (m/s²)", "y4", "purple", true) // Grouped with V Accl
+        };
     }
 
-    public object getLayout()
+    /// <summary>
+    /// Get the layout configuration for the chart.
+    /// </summary>
+    /// <returns>An object representing the layout configuration.</returns>
+    public object GetLayout()
     {
         return new
         {
@@ -49,13 +57,22 @@ public class PlotlyDatasource
         };
     }
 
+    /// <summary>
+    /// Create a data series for the chart.
+    /// </summary>
+    /// <param name="valueSelector">A function to select the value from the TrackLog.</param>
+    /// <param name="name">The name of the series.</param>
+    /// <param name="yAxis">The Y-axis to which the series belongs.</param>
+    /// <param name="color">The color of the series.</param>
+    /// <param name="hidden">Indicates whether the series should be hidden by default.</param>
+    /// <returns>An object representing the data series.</returns>
     public object CreateSeries(Func<TrackLog, double> valueSelector, string name, string yAxis, string color, bool hidden = false)
     {
-        var yData = Track.Data.Select(valueSelector).ToArray();
+        var yData = _track.Data.Select(valueSelector).ToArray();
 
         return new
         {
-            x = flightTime,
+            x = FlightTime,
             y = yData,
             type = "scatter",
             mode = "lines",
@@ -66,6 +83,16 @@ public class PlotlyDatasource
         };
     }
 
+    /// <summary>
+    /// Create a Y-axis configuration for the chart.
+    /// </summary>
+    /// <param name="name">The name of the Y-axis.</param>
+    /// <param name="tickFormat">The tick format for the Y-axis.</param>
+    /// <param name="showLabels">Indicates whether to show labels on the Y-axis.</param>
+    /// <param name="side">The side of the chart where the Y-axis is placed.</param>
+    /// <param name="position">The position of the Y-axis.</param>
+    /// <param name="overlaying">The overlaying configuration for the Y-axis.</param>
+    /// <returns>An object representing the Y-axis configuration.</returns>
     private object CreateYAxis(string name, string tickFormat = ".1f", bool showLabels = false, string side = "left", double position = 0, string? overlaying = null)
     {
         return new

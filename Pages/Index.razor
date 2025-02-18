@@ -9,12 +9,12 @@
 @inject TrackService TrackService
 @inject IJSRuntime JSRuntime
 <div style="width:100%; height:calc(100vh - 370px);">
-    <p>Track: @message <InputFile OnChange="HandleFileSelected" accept=".csv" /></p>
+    <p>Track: @_message <InputFile OnChange="HandleFileSelected" accept=".csv" /></p>
     <div id="plotlyChart" style="width:100%; height:100%;"></div>
 </div>
 <div style="display: flex; height: 340px;">
     <div style="flex: 1; padding: 10px; overflow-y: auto;">
-        @if (track == null)
+        @if (_track == null)
         {            
             <h3>No data</h3>
             <table id="stats" class="table">
@@ -60,44 +60,44 @@
         }
         else
         {
-            <h3>@track.TakeOffDateTime.ToString("HH:mm (d MMMM yyyy)")</h3>
+            <h3>@_track.TakeOffDateTime.ToString("HH:mm (d MMMM yyyy)")</h3>
             <table id="stats" class="table">
                 <tbody>            
                     <tr>
                         <th>Exit</th>
-                        <td>@track.ExitHeight.ToString("F0")m AGL at @track.ExitDateTime.ToString("HH:mm")</td>
+                        <td>@_track.ExitHeight.ToString("F0")m AGL at @_track.ExitDateTime.ToString("HH:mm")</td>
                         <th>Landing</th>
-                        <td>@track.LandingTime.ToString("HH:mm")</td>
+                        <td>@_track.LandingTime.ToString("HH:mm")</td>
                     </tr>
                     <tr>
                         <th>Pitch</th>
-                        <td>@track.PitchHeight.ToString("F0")m AGL at @track.PitchDateTime.ToString("HH:mm")</td>
+                        <td>@_track.PitchHeight.ToString("F0")m AGL at @_track.PitchDateTime.ToString("HH:mm")</td>
                         <th>DZ Elevation offset</th>
-                        <td>@track.DzAltitude.ToString("F0")m AMSL</td>
+                        <td>@_track.DzAltitude.ToString("F0")m AMSL</td>
                     </tr>
                     <tr>
                         <th>Flight time</th>
-                        <td>@track.FlightTime.ToString("F0")s over @((track.ExitAltitude - track.PitchAltitude).ToString("F0"))m</td>
+                        <td>@_track.FlightTime.ToString("F0")s over @((_track.ExitAltitude - _track.PitchAltitude).ToString("F0"))m</td>
                         <th>Total time</th>
-                        <td>@((track.LandingTime - track.TakeOffDateTime).TotalMinutes.ToString("F0"))min</td>
+                        <td>@((_track.LandingTime - _track.TakeOffDateTime).TotalMinutes.ToString("F0"))min</td>
                     </tr>
                     <tr>
                         <th>Total speed (Max)</th>
-                        <td>@track.VelocityTotalMax.ToString("F0") km/h</td>
+                        <td>@_track.VelocityTotalMax.ToString("F0") km/h</td>
                         <th>Total speed (Min)</th>
-                        <td>@track.VelocityTotalMin.ToString("F0") km/h</td>
+                        <td>@_track.VelocityTotalMin.ToString("F0") km/h</td>
                     </tr>
                     <tr>
                         <th>Ground speed (Max)</th>
-                        <td>@track.VelocityGroundMax.ToString("F0") km/h</td>
+                        <td>@_track.VelocityGroundMax.ToString("F0") km/h</td>
                         <th>Track length</th>
-                        <td>@track.HorizontalDistance.ToString("F0") km</td>
+                        <td>@_track.HorizontalDistance.ToString("F0") km</td>
                     </tr>
                     <tr>
                         <th>Glide ratio (Max)</th>
-                        <td>@track.GlideRatioMax.ToString("F1")</td>
+                        <td>@_track.GlideRatioMax.ToString("F1")</td>
                         <th>Glide ratio (Avg)</th>
-                        <td>@(((track.HorizontalDistance) / (track.ExitAltitude - track.PitchAltitude)).ToString("F1"))</td>
+                        <td>@(((_track.HorizontalDistance) / (_track.ExitAltitude - _track.PitchAltitude)).ToString("F1"))</td>
                     </tr>
                 </tbody>
             </table>

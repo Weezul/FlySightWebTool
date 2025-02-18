@@ -8,41 +8,47 @@ namespace FlySightWebTool.Pages
 {
     public partial class Index
     {
-        private Track? track;
-        private string message = "";
-        private int currentIndex;
+        private Track? _track;
+        private string _message = "";
+        private int _currentIndex;
 
         public Index()
-        {                        
-            track = null;
-            message = "";
-            currentIndex = 0;
+        {
+            _track = null;
+            _message = "";
+            _currentIndex = 0;
         }
 
+        /// <summary>
+        /// Initialize the component.
+        /// </summary>
         protected override Task OnInitializedAsync()
         {
-            return Task.CompletedTask;  
+            return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Handle file selection and read the file content.
+        /// </summary>
+        /// <param name="e">The file change event arguments.</param>
         private async Task HandleFileSelected(InputFileChangeEventArgs e)
         {
-            message = "Reading file..."; //Reading file
-            this.StateHasChanged();
+            _message = "Reading file...";
+            StateHasChanged();
 
             var file = e.File;
 
-            if (file == null) 
-                throw new Exception($"File object is null");
+            if (file == null)
+                throw new Exception("File object is null");
 
-            StringBuilder fileContent = new StringBuilder();
+            var fileContent = new StringBuilder();
 
             try
             {
                 using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10MB
-
                 using var reader = new StreamReader(stream);
 
-                char[] buffer = new char[8192]; // 8 KB buffer
+                var buffer = new char[8192]; // 8 KB buffer
                 int bytesRead;
 
                 while ((bytesRead = await reader.ReadAsync(buffer, 0, buffer.Length)) > 0)
@@ -50,60 +56,68 @@ namespace FlySightWebTool.Pages
                     fileContent.Append(buffer, 0, bytesRead);
                 }
 
-                message = "Computing..."; //Calculating
-                this.StateHasChanged();
+                _message = "Computing...";
+                StateHasChanged();
 
-                track = await TrackService.LoadTrackFromFileAsync(fileContent.ToString());
+                _track = await TrackService.LoadTrackFromFileAsync(fileContent.ToString());
 
-                message = ""; //Done
+                _message = "";
 
-                if (track.Data.Count == 0)
+                if (_track.Data.Count == 0)
                 {
-                    message = "No data";
-                    this.StateHasChanged();
+                    _message = "No data";
+                    StateHasChanged();
                 }
             }
             catch (Exception ex)
             {
                 throw new Exception($"Error reading file: {file.Name}, {ex.Message}");
-            }        
+            }
         }
 
+        /// <summary>
+        /// Update the X-axis value and place a marker on the map.
+        /// </summary>
+        /// <param name="index">The index of the data point.</param>
         [JSInvokable]
         public async Task UpdateXAxisValue(int index)
         {
-            currentIndex = index;
+            _currentIndex = index;
 
-            if (track != null && index >= 0 && index < track.Data.Count)
+            if (_track != null && index >= 0 && index < _track.Data.Count)
             {
-                var point = track.Data[index];
+                var point = _track.Data[index];
                 await JSRuntime.InvokeVoidAsync("mapInterop.placeMarker", point.Latitude, point.Longitude);
             }
 
-            this.StateHasChanged();
+            StateHasChanged();
         }
 
+        /// <summary>
+        /// Handle the rendering of the component.
+        /// </summary>
+        /// <param name="firstRender">Indicates whether this is the first render.</param>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
-            {            
+            {
                 await JSRuntime.InvokeVoidAsync("mapInterop.initializeMap");
             }
             else
             {
-                if (track == null || track.Data.Count == 0)
+                if (_track == null || _track.Data.Count == 0)
                     return;
 
-                var plotlyDatasource = new PlotlyDatasource(track);
-                var data = plotlyDatasource.getData();
-                var layout = plotlyDatasource.getLayout();
+                var plotlyDatasource = new PlotlyDatasource(_track);
+                var data = plotlyDatasource.GetData();
+                var layout = plotlyDatasource.GetLayout();
 
-                //Load chart data
+                // Load chart data
                 var dotNetObjectReference = DotNetObjectReference.Create(this);
                 await JSRuntime.InvokeVoidAsync("plotlyInterop.createChart", "plotlyChart", data, layout, dotNetObjectReference);
 
-                //Load map data
-                var coordinates = track.Data.Select(d => new { lat = d.Latitude, lng = d.Longitude }).ToList();
+                // Load map data
+                var coordinates = _track.Data.Select(d => new { lat = d.Latitude, lng = d.Longitude }).ToList();
                 await JSRuntime.InvokeVoidAsync("mapInterop.drawPathOnMap", coordinates);
             }
         }

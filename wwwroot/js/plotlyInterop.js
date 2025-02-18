@@ -1,4 +1,5 @@
 window.plotlyInterop = {
+    // Create a Plotly chart and set up the hover event
     createChart: function (chartId, data, layout, object) {
         console.info('Plotly chart created');
         Plotly.newPlot(chartId, data, layout);

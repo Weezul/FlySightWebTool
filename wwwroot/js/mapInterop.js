@@ -1,6 +1,7 @@
 let marker;
 
 window.mapInterop = {
+    // Initialize the Google Map
     initializeMap: function () {
         if (typeof google === 'undefined') {
             setTimeout(mapInterop.initializeMap, 100); // Retry after 100ms if google is not defined
@@ -30,6 +31,7 @@ window.mapInterop = {
         window.map = map; // Store map instance globally
     },
 
+    // Draw the flight path on the map
     drawPathOnMap: function (coordinates) {
         // Remove grayscale effect
         window.map.setOptions({
@@ -57,6 +59,7 @@ window.mapInterop = {
         window.map.fitBounds(bounds);
     },
 
+    // Place or move a marker on the map
     placeMarker: function (lat, lon) {
         console.info('Placing marker at:', lat, lon);
         if (!window.marker) {

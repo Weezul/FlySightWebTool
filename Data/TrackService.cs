@@ -1,111 +1,122 @@
-namespace FlySightWebTool.Data;
-
-public class TrackService
+namespace FlySightWebTool.Data
 {
-    bool hasTakenOff = false;
-    bool hasExited = false;
-    bool hasPitched = false;
-    bool hasLanded = false;
-
-    public Track Track { get; set; }
-
-    private TrackLog? prevTrackLog = null;
-    private long dzAltitudeCounter = 0;
-    private double dzAltitudeSum = 0.0;
-
-    public TrackService()
+    public class TrackService
     {
-        Track = new Track();
-    }
+        private bool _hasTakenOff = false;
+        private bool _hasExited = false;
+        private bool _hasPitched = false;
+        private bool _hasLanded = false;
 
-    public Task<Track> LoadTrackFromFileAsync(string fileContent)
-    {
-        string[] lines = fileContent.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+        public Track Track { get; set; }
 
-        foreach (var line in lines)
+        private TrackLog? _prevTrackLog = null;
+        private long _dzAltitudeCounter = 0;
+        private double _dzAltitudeSum = 0.0;
+
+        public TrackService()
         {
-            prevTrackLog = AppendFromCsvLine(line);
+            Track = new Track();
         }
 
-        return Task.FromResult(Track);
-    }
-
-    public TrackLog? AppendFromCsvLine(string line)
-    {
-        if (line.StartsWith("$GNSS"))
+        /// <summary>
+        /// Loads track data from a file asynchronously.
+        /// </summary>
+        /// <param name="fileContent">The content of the file.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the loaded track.</returns>
+        public Task<Track> LoadTrackFromFileAsync(string fileContent)
         {
-            try
+            string[] lines = fileContent.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
             {
-                var trackLog = TrackLog.FromCsvLine(line);
+                _prevTrackLog = AppendFromCsvLine(line);
+            }
 
-                if (prevTrackLog != null)
+            return Task.FromResult(Track);
+        }
+
+        /// <summary>
+        /// Appends a track log from a CSV line.
+        /// </summary>
+        /// <param name="line">The CSV line.</param>
+        /// <returns>The appended track log.</returns>
+        public TrackLog? AppendFromCsvLine(string line)
+        {
+            if (line.StartsWith("$GNSS"))
+            {
+                try
                 {
-                    //Keep Height 0 until we have the DzAltitude
-                    trackLog.computeRelative(prevTrackLog,
-                        Track.DzAltitude == 0.0 ? trackLog.Altitude : Track.DzAltitude,
-                        Track.ExitDateTime);
-                }
+                    var trackLog = TrackLog.FromCsvLine(line);
 
-                //Calibrate DzAltitude until hasTakenOff
-                if (!hasTakenOff && trackLog.AccuracyVertical < 10)
-                {
-                    dzAltitudeSum += trackLog.Altitude;
-                    dzAltitudeCounter++;
-                }
-
-                //Check for takeOff
-                if (!hasTakenOff &&
-                    trackLog.VelocityDown < -2.5) //-10kmh
-                {
-                    Track.DzAltitude = (dzAltitudeSum / dzAltitudeCounter);
-                    Track.TakeOffDateTime = trackLog.Time;
-
-                    hasTakenOff = true;
-                }
-
-                //Free fall starts when downward speed is significantly negative
-                else if (hasTakenOff &&
-                        !hasExited &&
-                        trackLog.VelocityDown > 10 &&
-                        trackLog.AccelerationDown > 3) //Should be acceleration down over 3!! accoridng to flysight :)
-                {
-                    Track.ExitDateTime = trackLog.Time;
-                    Track.ExitAltitude = trackLog.Altitude;
-                    hasExited = true;
-                }
-                //During free fall
-                else if (hasExited &&
-                         !hasPitched)
-                {
-                    Track.Data.Add(trackLog);
-
-                    //Parachute opens when vertical speed reduces significantly
-                    if (trackLog.VelocityTotal < 100 && trackLog.AccelerationDown < -10)
+                    if (_prevTrackLog != null)
                     {
-                        Track.PitchDateTime = trackLog.Time;
-                        Track.PitchAltitude = trackLog.Altitude;
-                        Track.FlightTime = trackLog.FlightTimeStamp;
-                        hasPitched = true;
+                        // Keep Height 0 until we have the DzAltitude
+                        trackLog.ComputeRelative(_prevTrackLog,
+                            Track.DzAltitude == 0.0 ? trackLog.Altitude : Track.DzAltitude,
+                            Track.ExitDateTime);
                     }
+
+                    // Calibrate DzAltitude until hasTakenOff
+                    if (!_hasTakenOff && trackLog.AccuracyVertical < 10)
+                    {
+                        _dzAltitudeSum += trackLog.Altitude;
+                        _dzAltitudeCounter++;
+                    }
+
+                    // Check for takeOff
+                    if (!_hasTakenOff &&
+                        trackLog.VelocityDown < -2.5) // -10kmh
+                    {
+                        Track.DzAltitude = (_dzAltitudeSum / _dzAltitudeCounter);
+                        Track.TakeOffDateTime = trackLog.Time;
+
+                        _hasTakenOff = true;
+                    }
+
+                    // Free fall starts when downward speed is significantly negative
+                    else if (_hasTakenOff &&
+                            !_hasExited &&
+                            trackLog.VelocityDown > 10 &&
+                            trackLog.AccelerationDown > 3) // Should be acceleration down over 3!! according to FlySight :)
+                    {
+                        Track.ExitDateTime = trackLog.Time;
+                        Track.ExitAltitude = trackLog.Altitude;
+                        _hasExited = true;
+                    }
+                    // During free fall
+                    else if (_hasExited &&
+                             !_hasPitched)
+                    {
+                        Track.Data.Add(trackLog);
+
+                        // Parachute opens when vertical speed reduces significantly
+                        if (trackLog.VelocityTotal < 100 && trackLog.AccelerationDown < -10)
+                        {
+                            Track.PitchDateTime = trackLog.Time;
+                            Track.PitchAltitude = trackLog.Altitude;
+                            Track.FlightTime = trackLog.FlightTimeStamp;
+                            _hasPitched = true;
+                        }
+                    }
+                    // Landing when speed is very low and altitude is near ground level
+                    else if (_hasPitched &&
+                            !_hasLanded &&
+                            trackLog.VelocityDown < 1)
+                    {
+                        Track.LandingTime = trackLog.Time;
+                        _hasLanded = true;
+                    }
+
+                    return trackLog;
                 }
-                //Landing when speed is very low and altitude is near ground level
-                else if (hasPitched &&
-                        !hasLanded &&
-                        trackLog.VelocityDown < 1)
+                catch (Exception ex)
                 {
-                    Track.LandingTime = trackLog.Time;
-                    hasLanded = true;
+                    throw new Exception($"Error parsing line: '{line}', {ex.Message}");
                 }
+            }
 
-                return trackLog;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error parsing line: '{line}', {ex.Message}");
-            }
+            Console.WriteLine($"Skipping non-DATA record: '{line}'");
+            return null;
         }
-
-        Console.WriteLine($"Skipping non-DATA record: '{line}'");
-        return null;
-    } 
+    }
 }
