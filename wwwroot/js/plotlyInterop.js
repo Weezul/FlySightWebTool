@@ -5,11 +5,10 @@ window.plotlyInterop = {
         
         var chart = document.getElementById(chartId);
         chart.on('plotly_hover', function (eventdata) {
+            var pointIndex = eventdata.points[0].pointIndex;
+            console.log('plotly_hover event triggered, pointIndex:', pointIndex);
             
-            var xValue = eventdata.points[0].x;
-            console.log('plotly_hover event triggered, xValue:', xValue);
-            
-            object.invokeMethodAsync('UpdateXAxisValue', xValue)
+            object.invokeMethodAsync('UpdateXAxisValue', pointIndex)
                 .then(function () {
                     console.info('Successfully invoked .NET method');
                 })

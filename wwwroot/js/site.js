@@ -1,3 +1,5 @@
+let marker;
+
 function initializeMap() {
     if (typeof google === 'undefined') {
         setTimeout(initializeMap, 100); // Retry after 100ms if google is not defined
@@ -52,4 +54,16 @@ function drawPathOnMap(coordinates) {
         bounds.extend(new google.maps.LatLng(coord.lat, coord.lng));
     });
     window.map.fitBounds(bounds);
+}
+
+function placeMarker(lat, lon) {
+    console.info('Placing marker at:', lat, lon);
+    if (!marker) {
+        marker = new google.maps.Marker({
+            position: { lat: lat, lng: lon },
+            map: window.map
+        });
+    } else {
+        marker.setPosition({ lat: lat, lng: lon });
+    }
 }

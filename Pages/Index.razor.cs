@@ -10,14 +10,13 @@ namespace FlySightWebTool.Pages
     {
         private Track? track;
         private string message = "";
-        private double currentXAxisValue;
+        private int currentIndex;
 
         public Index()
         {                        
             track = null;
             message = "";
-            currentXAxisValue = 0;
-
+            currentIndex = 0;
         }
 
         protected override Task OnInitializedAsync()
@@ -71,10 +70,17 @@ namespace FlySightWebTool.Pages
         }
 
         [JSInvokable]
-        public void UpdateXAxisValue(double xValue)
+        public async Task UpdateXAxisValue(int index)
         {
-            Console.WriteLine($"UpdateXAxisValue called with xValue: {xValue}");
-            currentXAxisValue = xValue;
+            Console.WriteLine($"UpdateXAxisValue called with index: {index}");
+            currentIndex = index;
+
+            if (track != null && index >= 0 && index < track.Data.Count)
+            {
+                var point = track.Data[index];
+                await JSRuntime.InvokeVoidAsync("placeMarker", point.Latitude, point.Longitude);
+            }
+
             this.StateHasChanged();
         }
 
