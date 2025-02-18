@@ -20,8 +20,8 @@ window.mapInterop = {
 
     // Initialize the Google Map
     initializeMap: function () {
-        if (typeof google === 'undefined') {
-            setTimeout(mapInterop.initializeMap, 100); // Retry after 100ms if google is not defined
+        if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+            setTimeout(mapInterop.initializeMap, 100); // Retry after 100ms if google or google.maps is not defined
             return;
         }
 
