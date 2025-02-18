@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using FlySightWebTool.Data;
 using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace FlySightWebTool.Pages
 {
@@ -10,11 +11,19 @@ namespace FlySightWebTool.Pages
     {
         private Track? _track;
         private string _message;
+        private readonly IConfiguration _configuration;
 
         public Index()
         {
             _track = null;
             _message = "";
+        }
+
+        public Index(IConfiguration configuration)
+        {
+            _track = null;
+            _message = "";
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -76,7 +85,6 @@ namespace FlySightWebTool.Pages
         /// <summary>
         /// Update the X-axis value and place a marker on the map.
         /// </summary>
-        /// <param name="index">The index of the data point.</param>
         [JSInvokable]
         public async Task UpdateXAxisValue(int index)
         {
@@ -92,11 +100,12 @@ namespace FlySightWebTool.Pages
         /// <summary>
         /// Handle the rendering of the component.
         /// </summary>
-        /// <param name="firstRender">Indicates whether this is the first render.</param>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
+                var apiKey = "AIzaSyBV2pNEzqnPBrW9OzPo60Zn7b0f5qZeWpQ"; //_configuration["GoogleMapsApiKey"];
+                await JSRuntime.InvokeVoidAsync("mapInterop.loadGoogleMapsApi", apiKey, DotNetObjectReference.Create(this));
                 await JSRuntime.InvokeVoidAsync("mapInterop.initializeMap");
             }
             else

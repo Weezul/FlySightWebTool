@@ -1,6 +1,23 @@
-let marker;
-
 window.mapInterop = {
+    // Load the Google Maps JavaScript API asynchronously
+    loadGoogleMapsApi: function (apiKey, callback) {
+        if (typeof google !== 'undefined') {
+            callback();
+            return;
+        }
+
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&loading=async`;
+        script.async = true;
+        script.defer = true;
+        window.initMap = function() {
+            if (typeof callback === 'function') {
+                callback();
+            }
+        };
+        document.head.appendChild(script);
+    },
+
     // Initialize the Google Map
     initializeMap: function () {
         if (typeof google === 'undefined') {
@@ -72,3 +89,6 @@ window.mapInterop = {
         }
     }
 };
+
+// Ensure initMap is defined globally
+window.initMap = window.mapInterop.initializeMap;
