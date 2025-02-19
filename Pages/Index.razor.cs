@@ -102,7 +102,7 @@ namespace FlySightWebTool.Pages
         {
             if (_track != null)
             {
-                await _track.AdjustFreefallTrimStart(seconds);
+                await _track.AdjustFreefallTrim(true, seconds);
                 StateHasChanged();
             }
         }
@@ -115,7 +115,7 @@ namespace FlySightWebTool.Pages
         {
             if (_track != null)
             {
-                await _track.AdjustFreefallTrimEnd(seconds);
+                await _track.AdjustFreefallTrim(false, seconds);
                 StateHasChanged();
             }
         }

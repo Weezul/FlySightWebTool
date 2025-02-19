@@ -46,79 +46,47 @@ namespace FlySightWebTool.Data
             Data = new List<TrackLog>();
         }
 
-        internal Task AdjustFreefallTrimStart(int seconds)
+        /// <summary>
+        /// Adjusts the start or end of the freefall trim.
+        /// </summary>
+        /// <param name="adjustStart">True to adjust the start, false to adjust the end.</param>
+        /// <param name="seconds">The number of seconds to adjust. Positive values move the trim forward, negative values move it backward.</param>
+        internal Task AdjustFreefallTrim(bool adjustStart, int seconds)
         {
-            var firstFreefallIndex = Data.FindIndex(d => d.Phase == FlightPhase.Freefall);
-            if (firstFreefallIndex >= 0)
+            int index = adjustStart 
+                ? Data.FindIndex(d => d.Phase == FlightPhase.Freefall) 
+                : Data.FindLastIndex(d => d.Phase == FlightPhase.Freefall);
+
+            if (index < 0)
             {
-                if (seconds > 0)
-                {
-                    //Move trim forward (Shorter flight)
-                    if (FreeFallTime < 10)
-                    {
-                        Console.Error.WriteLine("Flight time is less than 10 seconds, cannot adjust freefall start.");
-                        return Task.CompletedTask;
-                    }
-
-                    //Select all data points where time is between first freefall index time and first freefall index time + seconds
-                    var dataPoints = Data.Where(d => d.Time >= Data[firstFreefallIndex].Time && d.Time <= Data[firstFreefallIndex].Time.AddSeconds(seconds));
-
-                    foreach (var dataPoint in dataPoints)
-                    {
-                        dataPoint.Phase = FlightPhase.Aircraft;
-                    }
-                    Console.WriteLine($"Adjusted freefall start by {seconds} seconds. {dataPoints.Count()} data points affected.");
-                }
-                else
-                {
-                    //Move trim backward (Longer flight)
-                    //Select all data points where time is between first freefall index time and first freefall index time - seconds
-                    var dataPoints = Data.Where(d => d.Time >= Data[firstFreefallIndex].Time.AddSeconds(seconds) && d.Time <= Data[firstFreefallIndex].Time);
-                    foreach (var dataPoint in dataPoints)
-                    {
-                        dataPoint.Phase = FlightPhase.Freefall;
-                    }
-                    Console.WriteLine($"Adjusted freefall start by {seconds} seconds. {dataPoints.Count()} data points affected.");
-                }                    
+                Console.Error.WriteLine("No freefall phase found.");
+                return Task.CompletedTask;
             }
 
-            return Task.CompletedTask;
-        }
-
-        internal Task AdjustFreefallTrimEnd(int seconds)
-        {
-            var lastFreefallIndex = Data.FindLastIndex(d => d.Phase == FlightPhase.Freefall);
-            if (lastFreefallIndex >= 0)
+            //Don't shorten freefall track if it's less than 10 seconds long
+            if ((adjustStart && seconds > 0) || (!adjustStart && seconds < 0))
             {
-                if (seconds > 0)
+                if (FreeFallTime < 10)
                 {
-                    //Select all data points where time is between last freefall index time and last freefall index time + seconds
-                    var dataPoints = Data.Where(d => d.Time >= Data[lastFreefallIndex].Time && d.Time <= Data[lastFreefallIndex].Time.AddSeconds(seconds));
-
-                    foreach (var dataPoint in dataPoints)
-                    {
-                        dataPoint.Phase = FlightPhase.Freefall;
-                    }
-                    Console.WriteLine($"Adjusted freefall end by {seconds} seconds. {dataPoints.Count()} data points affected.");
+                    Console.Error.WriteLine("Flight time is less than 10 seconds, cannot adjust freefall trim.");
+                    return Task.CompletedTask;
                 }
-                else
-                {
-                    if (FreeFallTime < 10)
-                    {
-                        Console.Error.WriteLine("Flight time is less than 10 seconds, cannot adjust freefall end.");
-                        return Task.CompletedTask;
-                    }
-
-                    //Select all data points where time is between last freefall index time and last freefall index time - seconds
-                    var dataPoints = Data.Where(d => d.Time >= Data[lastFreefallIndex].Time.AddSeconds(seconds) && d.Time <= Data[lastFreefallIndex].Time);
-                    foreach (var dataPoint in dataPoints)
-                    {
-                        dataPoint.Phase = FlightPhase.Canopy;
-                    }
-                    Console.WriteLine($"Adjusted freefall end by {seconds} seconds. {dataPoints.Count()} data points affected.");
-                }                    
             }
 
+            //Get time window to update
+            DateTime referenceTime = Data[index].Time;
+            DateTime minTime = seconds > 0 ? referenceTime : referenceTime.AddSeconds(seconds);
+            DateTime maxTime = seconds > 0 ? referenceTime.AddSeconds(seconds) : referenceTime;
+
+            var dataPoints = Data.Where(d => d.Time >= minTime && d.Time <= maxTime);
+            foreach (var dataPoint in dataPoints)
+            {
+                dataPoint.Phase = adjustStart 
+                    ? (seconds > 0 ? FlightPhase.Aircraft : FlightPhase.Freefall) 
+                    : (seconds > 0 ? FlightPhase.Freefall : FlightPhase.Canopy);
+            }
+
+            Console.WriteLine($"Adjusted freefall {(adjustStart ? "start" : "end")} by {seconds} seconds. {dataPoints.Count()} data points affected.");
             return Task.CompletedTask;
         }
     }
