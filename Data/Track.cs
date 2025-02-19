@@ -9,11 +9,11 @@ namespace FlySightWebTool.Data
         // Properties
         public DateTime TakeOffDateTime { get; set; }
         public double DzAltitude { get; set; }
-        public DateTime ExitDateTime { get; set; }
-        public double ExitAltitude { get; set; }
+        public DateTime ExitDateTime => Data.Find(d => d.Phase == FlightPhase.Freefall)?.Time ?? DateTime.MinValue;
+        public double ExitAltitude => Data.Find(d => d.Phase == FlightPhase.Freefall)?.Altitude ?? 0;
         public double ExitHeight => ExitAltitude - DzAltitude;
-        public DateTime PitchDateTime { get; set; }
-        public double PitchAltitude { get; set; }
+        public DateTime PitchDateTime => Data.FindLast(d => d.Phase == FlightPhase.Freefall)?.Time ?? DateTime.MinValue;
+        public double PitchAltitude => Data.FindLast(d => d.Phase == FlightPhase.Freefall)?.Altitude ?? 0;
         public double PitchHeight => PitchAltitude - DzAltitude;
         public DateTime LandingTime { get; set; }
         

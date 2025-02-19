@@ -24,8 +24,7 @@ namespace FlySightWebTool.Tests
             // Arrange
             var track = new Track
             {
-                DzAltitude = 1000,
-                ExitAltitude = 2000
+                DzAltitude = 1000
             };
 
             // Act
@@ -41,8 +40,7 @@ namespace FlySightWebTool.Tests
             // Arrange
             var track = new Track
             {
-                DzAltitude = 1000,
-                PitchAltitude = 1500
+                DzAltitude = 1000
             };
 
             // Act

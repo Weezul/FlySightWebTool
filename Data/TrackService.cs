@@ -82,9 +82,6 @@ namespace FlySightWebTool.Data
                             trackLog.VelocityDown > 10 &&
                             trackLog.AccelerationDown > 3)
                     {
-                        Track.ExitDateTime = trackLog.Time;
-                        Track.ExitAltitude = trackLog.Altitude;
-
                         _hasExited = true;
                         currentPhase = FlightPhase.Freefall;
                     }
@@ -97,9 +94,6 @@ namespace FlySightWebTool.Data
                             trackLog.AccelerationDown < -5 &&
                             trackLog.VelocityDown < 80)
                         {
-                            Track.PitchDateTime = trackLog.Time;
-                            Track.PitchAltitude = trackLog.Altitude;
-
                             _hasPitched = true;
                             currentPhase = FlightPhase.Canopy;
                         }
