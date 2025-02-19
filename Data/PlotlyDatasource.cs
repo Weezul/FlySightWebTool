@@ -2,12 +2,12 @@ namespace FlySightWebTool.Data;
 
 public class PlotlyDatasource
 {
-    private readonly Track _track;
-    private double[] FlightTime => _track.Data.Select(t => t.FlightTimeStamp).ToArray();
+    private readonly List<TrackLog> _data;
+    private double[] FlightTime => _data.Select(t => t.FlightTimeStamp).ToArray();
 
-    public PlotlyDatasource(Track track)
+    public PlotlyDatasource(List<TrackLog> data)
     {
-        _track = track;
+        _data = data;
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class PlotlyDatasource
     /// <returns>An object representing the data series.</returns>
     public object CreateSeries(Func<TrackLog, double> valueSelector, string name, string yAxis, string color, bool hidden = false)
     {
-        var yData = _track.Data.Select(valueSelector).ToArray();
+        var yData = _data.Select(valueSelector).ToArray();
 
         return new
         {

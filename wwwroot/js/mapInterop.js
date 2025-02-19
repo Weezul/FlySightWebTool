@@ -52,6 +52,11 @@ window.mapInterop = {
 
     // Draw the flight path on the map
     drawPathOnMap: function (coordinates) {
+        // Remove existing path if any
+        if (window.flightPath) {
+            window.flightPath.setMap(null);
+        }
+
         // Remove grayscale effect
         window.map.setOptions({
             styles: null,
@@ -62,7 +67,7 @@ window.mapInterop = {
             mapTypeId: google.maps.MapTypeId.HYBRID
         });
 
-        const flightPath = new google.maps.Polyline({
+        window.flightPath = new google.maps.Polyline({
             path: coordinates,
             geodesic: true,
             strokeColor: "#FF0000",
@@ -70,7 +75,7 @@ window.mapInterop = {
             strokeWeight: 2
         });
 
-        flightPath.setMap(window.map);
+        window.flightPath.setMap(window.map);
 
         // Adjust map center and zoom to fit the path
         const bounds = new google.maps.LatLngBounds();
@@ -81,8 +86,7 @@ window.mapInterop = {
     },
 
     // Place or move a marker on the map
-    placeMarker: function (lat, lon) {
-        console.info('Placing marker at:', lat, lon);
+    placeMarker: function (lat, lon) {        
         if (!window.marker) {
             window.marker = new google.maps.Marker({
                 position: { lat: lat, lng: lon },

@@ -2,6 +2,15 @@ using System;
 
 namespace FlySightWebTool.Data
 {
+    public enum FlightPhase
+    {
+        Boarding,
+        Aircraft,
+        Freefall,
+        Canopy,
+        Landed
+    }
+
     public class TrackLog
     {
         // Logged data
@@ -19,8 +28,7 @@ namespace FlySightWebTool.Data
 
         // Computed data
         public double VelocityTotal { get; set; } // Velocity total (m/s)
-        public double VelocityGround { get; set; } // Velocity over ground plane (m/s)
-        // TODO: Add angle?
+        public double VelocityGround { get; set; } // Velocity over ground plane (m/s)        
         public double AccelerationNorth { get; set; } // Acceleration North (m/s/s)
         public double AccelerationEast { get; set; } // Acceleration East (m/s/s)
         public double AccelerationDown { get; set; } // Acceleration Down (m/s/s)
@@ -33,6 +41,7 @@ namespace FlySightWebTool.Data
         public double VelocityGroundKmh => VelocityGround * 3.6; // Velocity ground (km/h)
         public double VelocityTotalKmh => VelocityTotal * 3.6; // Velocity total (km/h)
         public double HorizontalDistance { get; set; } // Horizontal distance (m)
+        public FlightPhase Phase; //Flight phase
 
         /// <summary>
         /// Creates a TrackLog instance from a CSV line.

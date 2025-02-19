@@ -12,6 +12,7 @@ namespace FlySightWebTool.Data
         private TrackLog? _prevTrackLog = null;
         private long _dzAltitudeCounter = 0;
         private double _dzAltitudeSum = 0.0;
+        private FlightPhase currentPhase = FlightPhase.Boarding;
 
         public TrackService()
         {
@@ -47,6 +48,7 @@ namespace FlySightWebTool.Data
                 try
                 {
                     var trackLog = TrackLog.FromCsvLine(line);
+                    trackLog.Phase = currentPhase;
 
                     if (_prevTrackLog != null)
                     {
@@ -63,7 +65,7 @@ namespace FlySightWebTool.Data
                         _dzAltitudeCounter++;
                     }
 
-                    // Check for takeOff
+                    // Find takeOff
                     if (!_hasTakenOff &&
                         trackLog.VelocityDown < -2.5) // -10kmh
                     {
@@ -71,31 +73,35 @@ namespace FlySightWebTool.Data
                         Track.TakeOffDateTime = trackLog.Time;
 
                         _hasTakenOff = true;
+                        currentPhase = FlightPhase.Aircraft;
                     }
 
                     // Free fall starts when downward speed is significantly negative
                     else if (_hasTakenOff &&
                             !_hasExited &&
                             trackLog.VelocityDown > 10 &&
-                            trackLog.AccelerationDown > 3) // Should be acceleration down over 3!! according to FlySight :)
+                            trackLog.AccelerationDown > 3)
                     {
                         Track.ExitDateTime = trackLog.Time;
                         Track.ExitAltitude = trackLog.Altitude;
+
                         _hasExited = true;
+                        currentPhase = FlightPhase.Freefall;
                     }
                     // During free fall
                     else if (_hasExited &&
                              !_hasPitched)
                     {
-                        Track.Data.Add(trackLog);
-
                         // Parachute opens when vertical speed reduces significantly
-                        if (trackLog.VelocityTotal < 100 && trackLog.AccelerationDown < -10)
+                        if (trackLog.VelocityTotal < 80 && 
+                            trackLog.AccelerationDown < -5 &&
+                            trackLog.VelocityDown < 80)
                         {
                             Track.PitchDateTime = trackLog.Time;
                             Track.PitchAltitude = trackLog.Altitude;
-                            Track.FlightTime = trackLog.FlightTimeStamp;
+
                             _hasPitched = true;
+                            currentPhase = FlightPhase.Canopy;
                         }
                     }
                     // Landing when speed is very low and altitude is near ground level
@@ -104,8 +110,13 @@ namespace FlySightWebTool.Data
                             trackLog.VelocityDown < 1)
                     {
                         Track.LandingTime = trackLog.Time;
+
                         _hasLanded = true;
+                        currentPhase = FlightPhase.Landed;
                     }
+
+                    //Add to track
+                    Track.Data.Add(trackLog);
 
                     return trackLog;
                 }

@@ -69,6 +69,10 @@ namespace FlySightWebTool.Pages
             }
             catch (Exception ex)
             {
+                _message = ex.Message;
+                StateHasChanged();
+
+                Console.WriteLine($"Error reading file: {file.Name}, {ex.Message}");
                 throw new Exception($"Error reading file: {file.Name}, {ex.Message}");
             }
         }
@@ -79,13 +83,41 @@ namespace FlySightWebTool.Pages
         [JSInvokable]
         public async Task UpdateGraphCursor(int index)
         {
-            if (_track != null && index >= 0 && index < _track.Data.Count)
+            var firstFreeFallIndex = _track.Data.FindIndex(d => d.Phase == FlightPhase.Freefall);
+            
+            if (_track != null && index >= 0 && firstFreeFallIndex >= 0 && index < _track.Data.Count)
             {
-                var point = _track.Data[index];
+                var point = _track.Data[firstFreeFallIndex + index];
                 await JSRuntime.InvokeVoidAsync("mapInterop.placeMarker", point.Latitude, point.Longitude);
             }
 
             StateHasChanged();
+        }
+
+        /// <summary>
+        /// Updates tracklog phase to earlier/later exit time
+        /// </summary>
+        [JSInvokable]
+        public async Task AdjustFreefallTrimStart(int seconds)
+        {
+            if (_track != null)
+            {
+                await _track.AdjustFreefallTrimStart(seconds);
+                StateHasChanged();
+            }
+        }
+
+        /// <summary>
+        /// Updates tracklog phase to earlier/later exit time
+        /// </summary>
+        [JSInvokable]
+        public async Task AdjustFreefallTrimEnd(int seconds)
+        {
+            if (_track != null)
+            {
+                await _track.AdjustFreefallTrimEnd(seconds);
+                StateHasChanged();
+            }
         }
 
         /// <summary>
@@ -103,16 +135,18 @@ namespace FlySightWebTool.Pages
                 if (_track == null || _track.Data.Count == 0)
                     return;
 
-                var plotlyDatasource = new PlotlyDatasource(_track);
+                // Load chart data
+                var plotlyDatasource = new PlotlyDatasource(_track.Data.Where(t => t.Phase == FlightPhase.Freefall).ToList());
                 var data = plotlyDatasource.GetData();
                 var layout = plotlyDatasource.GetLayout();
 
-                // Load chart data
                 var dotNetObjectReference = DotNetObjectReference.Create(this);
                 await JSRuntime.InvokeVoidAsync("plotlyInterop.createChart", "plotlyChart", data, layout, dotNetObjectReference);
 
                 // Load map data
-                var coordinates = _track.Data.Select(d => new { lat = d.Latitude, lng = d.Longitude }).ToList();
+                var mapDatasource = new MapDatasource(_track.Data.Where(t => t.Phase == FlightPhase.Freefall).ToList());
+
+                var coordinates = mapDatasource.GetPath();
                 await JSRuntime.InvokeVoidAsync("mapInterop.drawPathOnMap", coordinates);
             }
         }

@@ -104,3 +104,17 @@ th {
 td {
 	background-color: rgba(255,255,255,0.2);
 }
+
+button {
+    border: 1px solid white; /* Ensures visibility on dark backgrounds */
+    border-radius: 5px; /* Adjust for more or less rounding */
+    background: transparent;
+    color: white; /* Adjust for better contrast */
+    padding: 0px 3px;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+}
+
+button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Light transparency on hover */
+}

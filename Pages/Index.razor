@@ -10,7 +10,11 @@
 @inject IJSRuntime JSRuntime
 
 <div style="width:100%; height:calc(100vh - 370px);">
-    <p>Track: @_message <InputFile OnChange="HandleFileSelected" accept=".csv" /></p>
+    <p>Track: <InputFile OnChange="HandleFileSelected" accept=".csv" /></p>
+    @if (_track == null || _track.Data.Count == 0)
+    {
+        <p>@_message</p>
+    }    
     <div id="plotlyChart" style="width:100%; height:100%;"></div>
 </div>
 <div style="display: flex; height: 340px;">
@@ -65,20 +69,34 @@
             <table id="stats" class="table">
                 <tbody>            
                     <tr>
-                        <th>Exit</th>
-                        <td>@_track.ExitHeight.ToString("F0")m AGL at @_track.ExitDateTime.ToString("HH:mm")</td>
+                        <th>Exit
+                            <div style="float: right;">
+                                <button @onclick="() => AdjustFreefallTrimStart(-10)">-10</button>
+                                <button @onclick="() => AdjustFreefallTrimStart(-1)">-1</button>
+                                <button @onclick="() => AdjustFreefallTrimStart(1)">+1</button>
+                                <button @onclick="() => AdjustFreefallTrimStart(10)">+10</button>
+                            </div>
+                        </th>
+                        <td>@_track.ExitHeight.ToString("F0")m AGL at @_track.ExitDateTime.ToString("HH:mm:ss")</td>
                         <th>Landing</th>
-                        <td>@_track.LandingTime.ToString("HH:mm")</td>
+                        <td>@_track.LandingTime.ToString("HH:mm:ss")</td>
                     </tr>
                     <tr>
-                        <th>Pitch</th>
-                        <td>@_track.PitchHeight.ToString("F0")m AGL at @_track.PitchDateTime.ToString("HH:mm")</td>
+                        <th>Pitch
+                            <div style="float: right;">
+                                <button @onclick="() => AdjustFreefallTrimEnd(-10)">-10</button>
+                                <button @onclick="() => AdjustFreefallTrimEnd(-1)">-1</button>
+                                <button @onclick="() => AdjustFreefallTrimEnd(1)">+1</button>
+                                <button @onclick="() => AdjustFreefallTrimEnd(10)">+10</button>
+                            </div>
+                        </th>
+                        <td>@_track.PitchHeight.ToString("F0")m AGL at @_track.PitchDateTime.ToString("HH:mm:ss")</td>
                         <th>DZ Elevation offset</th>
                         <td>@_track.DzAltitude.ToString("F0")m AMSL</td>
                     </tr>
                     <tr>
                         <th>Flight time</th>
-                        <td>@_track.FlightTime.ToString("F0")s over @((_track.ExitAltitude - _track.PitchAltitude).ToString("F0"))m</td>
+                        <td>@_track.FreeFallTime.ToString("F0")s over @((_track.ExitAltitude - _track.PitchAltitude).ToString("F0"))m</td>
                         <th>Total time</th>
                         <td>@((_track.LandingTime - _track.TakeOffDateTime).TotalMinutes.ToString("F0"))min</td>
                     </tr>
