@@ -45,8 +45,7 @@ public class PlotlyDatasource
         if (Layout == null)
         {
             Layout = new
-            {
-                title = new { text = "Flight Data Visualization", font = new { color = "white" } },
+            {                
                 xaxis = new { title = new { text = "Time (s)", font = new { color = "white" } }, tickfont = new { color = "white" } },
                 yaxis = CreateYAxis("Height (m)", ".0f", true, "left", 0),
                 yaxis2 = CreateYAxis("Glide Ratio", ".1f", true, "left", 0.1, "y"),

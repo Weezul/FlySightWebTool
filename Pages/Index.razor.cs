@@ -94,8 +94,6 @@ namespace FlySightWebTool.Pages
                     var point = _track.Data[firstFreeFallIndex + index];
                     await JSRuntime.InvokeVoidAsync("mapInterop.placeMarker", point.Latitude, point.Longitude);
                 }
-
-                //StateHasChanged();
             }
         }
 
@@ -109,7 +107,6 @@ namespace FlySightWebTool.Pages
             {
                 await _track.AdjustFreefallTrim(true, seconds);
                 loadData();
-                //StateHasChanged();
             }
         }
 
@@ -123,7 +120,6 @@ namespace FlySightWebTool.Pages
             {
                 await _track.AdjustFreefallTrim(false, seconds);
                 loadData();
-                //StateHasChanged();
             }
         }     
 
