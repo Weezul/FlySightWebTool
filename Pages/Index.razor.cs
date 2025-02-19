@@ -10,6 +10,8 @@ namespace FlySightWebTool.Pages
     {
         private Track? _track;
         private string _message;
+        private PlotlyDatasource? plotlyDatasource;
+        private MapDatasource? mapDatasource;
 
         public Index()
         {
@@ -81,17 +83,20 @@ namespace FlySightWebTool.Pages
         /// Update the X-axis value and place a marker on the map.
         /// </summary>
         [JSInvokable]
-        public async Task UpdateGraphCursor(int index)
+        public async Task UpdateChartCursor(int index)
         {
-            var firstFreeFallIndex = _track.Data.FindIndex(d => d.Phase == FlightPhase.Freefall);
-            
-            if (_track != null && index >= 0 && firstFreeFallIndex >= 0 && index < _track.Data.Count)
+            if (_track != null)
             {
-                var point = _track.Data[firstFreeFallIndex + index];
-                await JSRuntime.InvokeVoidAsync("mapInterop.placeMarker", point.Latitude, point.Longitude);
-            }
+                var firstFreeFallIndex = _track.Data.FindIndex(d => d.Phase == FlightPhase.Freefall);
+                
+                if (_track != null && index >= 0 && firstFreeFallIndex >= 0 && index < _track.Data.Count)
+                {
+                    var point = _track.Data[firstFreeFallIndex + index];
+                    await JSRuntime.InvokeVoidAsync("mapInterop.placeMarker", point.Latitude, point.Longitude);
+                }
 
-            StateHasChanged();
+                //StateHasChanged();
+            }
         }
 
         /// <summary>
@@ -103,7 +108,8 @@ namespace FlySightWebTool.Pages
             if (_track != null)
             {
                 await _track.AdjustFreefallTrim(true, seconds);
-                StateHasChanged();
+                loadData();
+                //StateHasChanged();
             }
         }
 
@@ -116,7 +122,17 @@ namespace FlySightWebTool.Pages
             if (_track != null)
             {
                 await _track.AdjustFreefallTrim(false, seconds);
-                StateHasChanged();
+                loadData();
+                //StateHasChanged();
+            }
+        }     
+
+        private void loadData()
+        {
+            if (_track != null)
+            {
+                plotlyDatasource = new PlotlyDatasource(_track.Data.Where(t => t.Phase == FlightPhase.Freefall).ToList());
+                mapDatasource = new MapDatasource(_track.Data.Where(t => t.Phase == FlightPhase.Freefall).ToList());
             }
         }
 
@@ -135,19 +151,27 @@ namespace FlySightWebTool.Pages
                 if (_track == null || _track.Data.Count == 0)
                     return;
 
-                // Load chart data
-                var plotlyDatasource = new PlotlyDatasource(_track.Data.Where(t => t.Phase == FlightPhase.Freefall).ToList());
-                var data = plotlyDatasource.GetData();
-                var layout = plotlyDatasource.GetLayout();
+                if (plotlyDatasource == null || mapDatasource == null)
+                {
+                    loadData();
+                }
 
-                var dotNetObjectReference = DotNetObjectReference.Create(this);
-                await JSRuntime.InvokeVoidAsync("plotlyInterop.createChart", "plotlyChart", data, layout, dotNetObjectReference);
+                // Load chart data      
+                if (plotlyDatasource != null)
+                {
+                    var data = plotlyDatasource.GetData();
+                    var layout = plotlyDatasource.GetLayout();
+
+                    var dotNetObjectReference = DotNetObjectReference.Create(this);
+                    await JSRuntime.InvokeVoidAsync("plotlyInterop.createChart", "plotlyChart", data, layout, dotNetObjectReference);
+                }
 
                 // Load map data
-                var mapDatasource = new MapDatasource(_track.Data.Where(t => t.Phase == FlightPhase.Freefall).ToList());
-
-                var coordinates = mapDatasource.GetPath();
-                await JSRuntime.InvokeVoidAsync("mapInterop.drawPathOnMap", coordinates);
+                if (mapDatasource != null)
+                {
+                    var coordinates = mapDatasource.GetPath();
+                    await JSRuntime.InvokeVoidAsync("mapInterop.drawPathOnMap", coordinates);
+                }
             }
         }
     }

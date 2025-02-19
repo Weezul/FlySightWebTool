@@ -4,6 +4,8 @@ public class PlotlyDatasource
 {
     private readonly List<TrackLog> _data;
     private double[] FlightTime => _data.Select(t => t.FlightTimeStamp).ToArray();
+    private object[] Data;
+    private object Layout;
 
     public PlotlyDatasource(List<TrackLog> data)
     {
@@ -16,17 +18,22 @@ public class PlotlyDatasource
     /// <returns>An array of data series objects.</returns>
     public object[] GetData()
     {
-        return new object[]
+        if (Data == null)
         {
-            CreateSeries(t => t.Height, "Height (AGL)", "y1", "grey"),
-            CreateSeries(t => t.GlideRatio, "Glide Ratio", "y2", "lime"),
-            CreateSeries(t => t.VelocityDownKmh, "Speed Vert (km/h)", "y3", "red"),
-            CreateSeries(t => t.VelocityGroundKmh, "Speed Ground (km/h)", "y3", "cyan"), // Grouped with Speed Vert
-            CreateSeries(t => t.VelocityTotalKmh, "Speed Total (km/h)", "y3", "blue"), // Grouped with Speed Vert
-            CreateSeries(t => t.AccelerationDown, "V Accl (m/s²)", "y4", "orange", true),
-            CreateSeries(t => t.AccelerationGround, "H Accl (m/s²)", "y4", "yellow", true), // Grouped with V Accl
-            CreateSeries(t => t.AccelerationTotal, "Accl (m/s²)", "y4", "purple", true) // Grouped with V Accl
-        };
+            Data = new object[]
+            {
+                CreateSeries(t => t.Height, "Height (AGL)", "y1", "grey"),
+                CreateSeries(t => t.GlideRatio, "Glide Ratio", "y2", "lime"),
+                CreateSeries(t => t.VelocityDownKmh, "Speed Vert (km/h)", "y3", "red"),
+                CreateSeries(t => t.VelocityGroundKmh, "Speed Ground (km/h)", "y3", "cyan"), // Grouped with Speed Vert
+                CreateSeries(t => t.VelocityTotalKmh, "Speed Total (km/h)", "y3", "blue"), // Grouped with Speed Vert
+                CreateSeries(t => t.AccelerationDown, "V Accl (m/s²)", "y4", "orange"),
+                CreateSeries(t => t.AccelerationGround, "H Accl (m/s²)", "y4", "yellow"), // Grouped with V Accl
+                CreateSeries(t => t.AccelerationTotal, "Accl (m/s²)", "y4", "purple") // Grouped with V Accl
+            };
+        }
+
+        return Data;
     }
 
     /// <summary>
@@ -35,26 +42,31 @@ public class PlotlyDatasource
     /// <returns>An object representing the layout configuration.</returns>
     public object GetLayout()
     {
-        return new
+        if (Layout == null)
         {
-            title = new { text = "Flight Data Visualization", font = new { color = "white" } },
-            xaxis = new { title = new { text = "Time (s)", font = new { color = "white" } }, tickfont = new { color = "white" } },
-            yaxis = CreateYAxis("Height (m)", ".0f", true, "left", 0),
-            yaxis2 = CreateYAxis("Glide Ratio", ".1f", true, "left", 0.1, "y"),
-            yaxis3 = CreateYAxis("Speed (km/h)", ".0f", true, "right", 1, "y"),
-            yaxis4 = CreateYAxis("Acceleration (m/s²)", ".1f", true, "right", 0.9, "y"),
-            legend = new
+            Layout = new
             {
-                orientation = "h", // horizontal layout
-                yanchor = "bottom",
-                y = 1.1, // position above the graph
-                xanchor = "center",
-                x = 0.5, // center horizontally
-                font = new { color = "white" }
-            },
-            plot_bgcolor = "rgba(0,0,0,0)", // Transparent plot background
-            paper_bgcolor = "rgba(0,0,0,0)"  // Transparent paper background
-        };
+                title = new { text = "Flight Data Visualization", font = new { color = "white" } },
+                xaxis = new { title = new { text = "Time (s)", font = new { color = "white" } }, tickfont = new { color = "white" } },
+                yaxis = CreateYAxis("Height (m)", ".0f", true, "left", 0),
+                yaxis2 = CreateYAxis("Glide Ratio", ".1f", true, "left", 0.1, "y"),
+                yaxis3 = CreateYAxis("Speed (km/h)", ".0f", true, "right", 1, "y"),
+                yaxis4 = CreateYAxis("Acceleration (m/s²)", ".1f", true, "right", 0.9, "y"),
+                legend = new
+                {
+                    orientation = "h", // horizontal layout
+                    yanchor = "bottom",
+                    y = 1.1, // position above the graph
+                    xanchor = "center",
+                    x = 0.5, // center horizontally
+                    font = new { color = "white" }
+                },
+                plot_bgcolor = "rgba(0,0,0,0)", // Transparent plot background
+                paper_bgcolor = "rgba(0,0,0,0)"  // Transparent paper background
+            };
+        }
+
+        return Layout;
     }
 
     /// <summary>
@@ -66,7 +78,7 @@ public class PlotlyDatasource
     /// <param name="color">The color of the series.</param>
     /// <param name="hidden">Indicates whether the series should be hidden by default.</param>
     /// <returns>An object representing the data series.</returns>
-    public object CreateSeries(Func<TrackLog, double> valueSelector, string name, string yAxis, string color, bool hidden = false)
+    private object CreateSeries(Func<TrackLog, double> valueSelector, string name, string yAxis, string color, bool hidden = false)
     {
         var yData = _data.Select(valueSelector).ToArray();
 
@@ -78,8 +90,7 @@ public class PlotlyDatasource
             mode = "lines",
             name = name,
             yaxis = yAxis,
-            line = new { shape = "spline", color = color }, // Hardcoded color
-            visible = hidden ? "legendonly" : "true" // Hide series by default but keep in legend
+            line = new { shape = "spline", color = color }            
         };
     }
 
