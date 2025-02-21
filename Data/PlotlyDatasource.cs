@@ -4,8 +4,8 @@ public class PlotlyDatasource
 {
     private readonly List<TrackLog> _data;
     private double[] FlightTime => _data.Select(t => t.FlightTimeStamp).ToArray();
-    private object[] Data;
-    private object Layout;
+    private object[]? Data;
+    private object? Layout;
 
     public PlotlyDatasource(List<TrackLog> data)
     {
