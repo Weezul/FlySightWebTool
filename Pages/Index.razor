@@ -10,7 +10,7 @@
 @inject IJSRuntime JSRuntime
 
 <div style="width:100%; height:calc(100vh - 370px);">
-    <p>Track: <InputFile OnChange="HandleFileSelected" accept=".csv" /></p>
+    <p>Track: <InputFile OnChange="HandleFileSelected" accept=".csv"/></p>
     @if (_track == null || _track.Data.Count == 0)
     {
         <p>@_message</p>

@@ -1,3 +1,5 @@
+using System.Security.Principal;
+
 namespace FlySightWebTool.Data
 {
     public class TrackService
@@ -33,6 +35,8 @@ namespace FlySightWebTool.Data
                 _prevTrackLog = AppendFromCsvLine(line);
             }
 
+            validateTrack();
+
             return Task.FromResult(Track);
         }
 
@@ -67,6 +71,7 @@ namespace FlySightWebTool.Data
 
                     // Find takeOff
                     if (!_hasTakenOff &&
+                        trackLog.AccuracyVertical < 5 &&
                         trackLog.VelocityDown < -2.5) // -10kmh
                     {
                         Track.DzAltitude = (_dzAltitudeSum / _dzAltitudeCounter);
@@ -89,10 +94,11 @@ namespace FlySightWebTool.Data
                     else if (_hasExited &&
                              !_hasPitched)
                     {
-                        // Parachute opens when vertical speed reduces significantly
-                        if (trackLog.VelocityTotal < 80 && 
+                        // Parachute opens when vertical speed reduces significantly                        
+                        if ((trackLog.VelocityTotal - trackLog.VelocityDown) < 10 && 
+                            trackLog.VelocityTotal < 80 &&
                             trackLog.AccelerationDown < -5 &&
-                            trackLog.VelocityDown < 80)
+                            trackLog.AccelerationTotal < -5)
                         {
                             _hasPitched = true;
                             currentPhase = FlightPhase.Canopy;
@@ -122,6 +128,32 @@ namespace FlySightWebTool.Data
 
             Console.WriteLine($"Skipping non-DATA record: '{line}'");
             return null;
+        }
+
+        public void Reset()
+        {
+            _prevTrackLog = null;
+            _dzAltitudeCounter = 0;
+            _dzAltitudeSum = 0.0;
+            _hasTakenOff = false;
+            _hasExited = false;
+            _hasPitched = false;
+            _hasLanded = false;
+            currentPhase = FlightPhase.Boarding;
+
+            Track = new Track();
+        }
+
+        private void validateTrack()
+        {
+            if (Track.Data.Where(d => d.Phase == FlightPhase.Freefall).Count() == 0)
+            {
+                //Set all phases to Freefall
+                foreach (var data in Track.Data)
+                {
+                    data.Phase = FlightPhase.Freefall;
+                }    
+            }
         }
     }
 }

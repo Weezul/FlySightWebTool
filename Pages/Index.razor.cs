@@ -33,6 +33,12 @@ namespace FlySightWebTool.Pages
         /// <param name="e">The file change event arguments.</param>
         private async Task HandleFileSelected(InputFileChangeEventArgs e)
         {
+            plotlyDatasource = null;
+            mapDatasource = null;
+            _track = null;
+
+            TrackService.Reset();
+            
             _message = "Reading file...";
             StateHasChanged();
 
